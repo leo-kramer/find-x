@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Find X</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<section>
+			<h2>Select operators</h2>
+			<ul>
+				<li>
+					<input type="checkbox" id="add" />
+					<label for="add">Addition</label>
+				</li>
+				<li>
+					<input type="checkbox" id="sub" />
+					<label for="sub">Substract</label>
+				</li>
+				<li>
+					<input type="checkbox" id="mult" />
+					<label for="mult">Multiply</label>
+				</li>
+				<li>
+					<input type="checkbox" id="div" />
+					<label for="div">Divide</label>
+				</li>
+			</ul>
+
+			<h2>Select difficulty</h2>
+			<ul>
+				<li>
+					<input type="radio" id="easy" name="difficulty" />
+					<label for="easy">Easy</label>
+				</li>
+				<li>
+					<input type="radio" id="medium" name="difficulty" />
+					<label for="medium">Medium</label>
+				</li>
+			</ul>
+		</section>
+		<section>
+			<div class="container">
+				<h1>Find X</h1>
+
+				<!-- Puzzle -->
+				<section id="puzzle">
+					<!-- Left side -->
+					<p id="left-col">
+						<span>x</span>
+					</p>
+
+					<p>=</p>
+
+					<!-- Right side -->
+					<p id="right-col">
+						<span>2</span>
+						<span>+</span>
+						<span>3</span>
+					</p>
+				</section>
+
+				<!-- Input -->
+				<section id="input">
+					<input type="text" value="" id="answer" />
+					<div>
+						<button type="submit" id="submit">Submit</button>
+						<button id="reset">Reset</button>
+					</div>
+				</section>
+			</div>
+		</section>
+
+		<script src="script.js"></script>
+	</body>
+</html>
