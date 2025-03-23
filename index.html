@@ -26,6 +26,14 @@
 					<input type="checkbox" id="div" />
 					<label for="div">Divide</label>
 				</li>
+				<li>
+					<input type="checkbox" id="factor" />
+					<label for="factor">Expononant</label>
+				</li>
+				<li>
+					<input type="checkbox" id="brack" />
+					<label for="brack">Parenthesis</label>
+				</li>
 			</ul>
 
 			<h2>Select difficulty</h2>
@@ -38,27 +46,26 @@
 					<input type="radio" id="medium" name="difficulty" />
 					<label for="medium">Medium</label>
 				</li>
+				<li>
+					<input type="radio" id="medium" name="difficulty" />
+					<label for="medium">Hard</label>
+				</li>
 			</ul>
 		</section>
 		<section>
 			<div class="container">
 				<h1>Find X</h1>
+				<p id="score">0</p>
 
 				<!-- Puzzle -->
 				<section id="puzzle">
 					<!-- Left side -->
-					<p id="left-col">
-						<span>x</span>
-					</p>
+					<p id="left-col"></p>
 
 					<p>=</p>
 
 					<!-- Right side -->
-					<p id="right-col">
-						<span>2</span>
-						<span>+</span>
-						<span>3</span>
-					</p>
+					<p id="right-col"></p>
 				</section>
 
 				<!-- Input -->

@@ -4,19 +4,22 @@ const answerInput = document.getElementById("answer")
 const settings = document.querySelectorAll(
 	"body > section:first-of-type ul li input"
 )
-const difficultyLevels = ["easy", "medium"]
+const difficultyLevels = ["easy", "medium", "hard"]
 const operators = {
 	add: "+",
 	sub: "-",
 	mult: "*",
 	div: "/",
+	factor: "^",
+	brack: "()",
 }
+let score = 0
 
 // ORDER OF OPERATIONS
 // ()
 // ^2
-// *
 // /
+// *
 // +
 // -
 
@@ -32,15 +35,21 @@ const initPuzzle = () => {
 	}
 
 	let setOperators = []
+	let includeBrack = false
 	setTypes.forEach((type) => {
-		if (type in operators) {
+		if (type == "brack") {
+			includeBrack = true
+		} else if (type in operators) {
 			setOperators.push(operators[type])
 		}
 	})
+	console.log(includeBrack)
+	console.log(setOperators)
 
 	let placedX = false
 	let lastNumber = false
 	let lastOperator = false
+	let lastBrack = false
 
 	if (!placedX) {
 		insertX(leftCol)
@@ -50,16 +59,26 @@ const initPuzzle = () => {
 	switch (setDifficulty) {
 		case "easy":
 			lastNumber = insertNumber(rightCol, lastNumber, lastOperator)
-			lastOperator = insertOperator(
-				rightCol,
-				setOperators,
-				lastNumber,
-				lastOperator
-			)
-			lastNumber = insertNumber(rightCol, lastNumber, lastOperator)
+			lastOperator = insertOperator(rightCol, setOperators)
+			if (lastOperator !== "^") {
+				lastNumber = insertNumber(rightCol, lastNumber, lastOperator)
+			}
 			break
 
 		case "medium":
+			const iterations = Math.floor(Math.random() * 3 + 1)
+
+			lastNumber = insertNumber(rightCol, lastNumber, lastOperator)
+			for (let i = 1; i <= iterations; i++) {
+				if (Math.random() < iterations / 5) {
+					console.log("adding brackets")
+					lastBrack = insertBracket(rightCol, lastBrack)
+					insertIteration(rightCol, setOperators, lastNumber, lastOperator)
+					lastBrack = insertBracket(rightCol, lastBrack)
+				} else {
+					insertIteration(rightCol, setOperators, lastNumber, lastOperator)
+				}
+			}
 			break
 	}
 }
@@ -89,12 +108,56 @@ const insertNumber = (column, lastNumber, lastOperator) => {
 	return number
 }
 
-const insertOperator = (column, op, lastNumber, lastOperator) => {
-	const span = document.createElement("span")
-	const operator = op[Math.floor(Math.random() * op.length)]
-	span.innerHTML = operator
-	column.appendChild(span)
+const insertOperator = (column, op, lastOperator) => {
+	let operator = op[Math.floor(Math.random() * op.length)]
+	if (op.length > 1) {
+		while (operator === "^" && lastOperator === "^") {
+			operator = op[Math.floor(Math.random() * op.length)]
+		}
+	}
+
+	console.log(operator)
+	if (operator == "^") {
+		const span = document.createElement("span")
+		const factor = document.createElement("sup")
+		factor.innerHTML = Math.floor(Math.random() * 3 + 1)
+		column.appendChild(span)
+		span.appendChild(factor)
+		// lastOperator = operator
+
+		// if (op.length > 1) {
+		// 	insertOperator(column, op, lastNumber, lastOperator)
+		// }
+	} else {
+		const span = document.createElement("span")
+		span.innerHTML = operator
+		column.appendChild(span)
+	}
 	return operator
+}
+
+const insertBracket = (column, lastBrack) => {
+	const span = document.createElement("span")
+	if (!lastBrack) {
+		span.innerHTML = "("
+		lastBrack = true
+	} else {
+		span.innerHTML = ")"
+		lastBrack = false
+	}
+	column.appendChild(span)
+
+	return lastBrack
+}
+
+const insertIteration = (column, op, lastNumber, lastOperator) => {
+	lastOperator = insertOperator(column, op, lastOperator)
+	if (lastOperator !== "^") {
+		lastNumber = insertNumber(column, lastNumber, lastOperator)
+	} else if (op.length > 1) {
+		lastOperator = insertOperator(column, op, lastOperator)
+		lastNumber = insertNumber(column, lastNumber, lastOperator)
+	}
 }
 
 const insertX = (column) => {
@@ -118,8 +181,13 @@ const setSettings = () => {
 	return [setTypes, setDifficulty]
 }
 
-const resetPuzzle = () => {
+const resetPuzzle = (fullReset) => {
 	console.log("Resetting puzzle")
+
+	if (fullReset) {
+		score = 0
+		document.getElementById("score").innerHTML = score
+	}
 
 	while (leftCol.firstChild) {
 		leftCol.removeChild(leftCol.lastChild)
@@ -133,9 +201,15 @@ const validatePuzzle = (input) => {
 	const spans = rightCol.querySelectorAll("span")
 	let components = []
 	spans.forEach((span) => {
-		components.push(span.textContent)
+		if (span.querySelector("sup") !== null) {
+			components.push("**" + span.querySelector("sup").textContent)
+		} else {
+			components.push(span.textContent)
+		}
 	})
 	const calc = components.join("")
+	console.log(calc)
+	console.log(eval(calc))
 
 	try {
 		const result = eval(calc)
@@ -155,17 +229,21 @@ const submitAnswer = () => {
 	const result = validatePuzzle(answer)
 	if (result) {
 		console.log("Correct")
+		score++
+		document.getElementById("score").innerHTML = score
 		answerInput.value = ""
-		resetPuzzle()
+		resetPuzzle(false)
 		initPuzzle()
 	} else {
 		console.log("False")
+		score = 0
+		document.getElementById("score").innerHTML = score
 		answerInput.value = ""
 	}
 }
 
 document.getElementById("reset").onclick = () => {
-	resetPuzzle()
+	resetPuzzle(true)
 
 	initPuzzle()
 }
@@ -181,6 +259,6 @@ document.onkeyup = (e) => {
 }
 
 answerInput.onkeyup = () => {
-	const sanitizedValue = answerInput.value.replace(/[^0-9]/g, "")
+	const sanitizedValue = answerInput.value.replace(/(?!^-)[^0-9]/g, "")
 	answerInput.value = sanitizedValue
 }
